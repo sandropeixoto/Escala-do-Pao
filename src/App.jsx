@@ -1,13 +1,11 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, NavLink, useLocation } from 'react-router-dom';
+import { Routes, Route, NavLink } from 'react-router-dom';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
 import { FiHome, FiSettings, FiCoffee } from 'react-icons/fi';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const App = () => {
-  const location = useLocation();
-
   const PageLayout = ({ children }) => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -47,22 +45,13 @@ const App = () => {
       </header>
 
       <main className="max-w-7xl mx-auto p-8">
-        <AnimatePresence mode='wait'>
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<PageLayout><Home /></PageLayout>} />
-            <Route path="/admin" element={<PageLayout><Admin /></PageLayout>} />
-          </Routes>
-        </AnimatePresence>
+        <Routes>
+          <Route path="/" element={<PageLayout><Home /></PageLayout>} />
+          <Route path="/admin" element={<PageLayout><Admin /></PageLayout>} />
+        </Routes>
       </main>
     </div>
   );
 }
 
-// O componente principal precisa estar dentro do Router para usar o useLocation
-const Root = () => (
-  <Router>
-    <App />
-  </Router>
-);
-
-export default Root;
+export default App;

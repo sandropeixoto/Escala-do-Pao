@@ -1,7 +1,6 @@
 import React from 'react';
 import Schedule from '../components/Schedule';
 import { motion } from 'framer-motion';
-import { FiAward } from 'react-icons/fi';
 
 const Home = () => {
   return (
