@@ -1,31 +1,44 @@
 import React from 'react';
 import Schedule from '../components/Schedule';
+import { motion } from 'framer-motion';
+import { FiAward } from 'react-icons/fi';
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-gray-100 font-sans">
-      <div 
-        className="bg-cover bg-center text-white p-10 md:p-20 text-center shadow-lg"
-        style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1550989460-0d9418a096a2?q=80&w=2940&auto=format&fit=crop)' }}
-      >
-        <div className="bg-black bg-opacity-50 rounded-xl p-8">
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.7)' }}>
-            Escala do Pão
-          </h1>
-          <p className="mt-4 text-lg md:text-xl font-medium" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.7)' }}>
-            Acompanhe o responsável do dia por trazer o pão nosso de cada dia.
-          </p>
-        </div>
+    <motion.div 
+      className="space-y-12"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.7, delay: 0.2, ease: [0.25, 1, 0.5, 1] }}
+    >
+      <div className="text-center">
+        <motion.h1 
+          className="text-5xl md:text-7xl font-black bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400 leading-tight tracking-tighter"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          Acompanhe a Escala
+        </motion.h1>
+        <motion.p 
+          className="max-w-2xl mx-auto mt-4 text-xl text-gray-400"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
+        >
+          Veja quem é o responsável pelo café e pão de queijo nos próximos dias.
+        </motion.p>
       </div>
-      
-      <main className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 -mt-16">
-        <Schedule />
-      </main>
 
-      <footer className="text-center p-4 mt-8 text-gray-500">
-        <p>Feito com ❤️ e cafeína</p>
-      </footer>
-    </div>
+      <motion.div
+        initial={{ y: 30, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.9 }}
+      >
+        <Schedule />
+      </motion.div>
+
+    </motion.div>
   );
 };
 

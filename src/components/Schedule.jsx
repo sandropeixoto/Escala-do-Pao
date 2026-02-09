@@ -4,7 +4,8 @@ import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { generateSchedule } from '../utils/schedule';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { FiCalendar, FiUser, FiLoader, FiAlertTriangle } from 'react-icons/fi';
+import { FiCalendar, FiUser, FiLoader, FiAlertTriangle, FiAward } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Schedule = () => {
   const [schedule, setSchedule] = useState([]);
@@ -22,7 +23,6 @@ const Schedule = () => {
       if (participants.length === 0) {
         setError('Nenhum participante cadastrado. Adicione participantes no painel de controle.');
         setSchedule([]);
-        setLoading(false);
         return;
       }
 
@@ -30,18 +30,16 @@ const Schedule = () => {
       const holidays = holidaysSnapshot.docs
         .map(doc => {
           const data = doc.data();
-          // Garante que a data exista e seja um timestamp do Firestore antes de converter
-          return data.date && typeof data.date.toDate === 'function' ? data.date.toDate() : null;
+          return data.date?.toDate ? data.date.toDate() : null;
         })
-        .filter(Boolean); // Remove quaisquer entradas nulas/inválidas
+        .filter(Boolean);
 
-      // Lógica de geração da escala simplificada (sem persistência por enquanto)
       const generatedSchedule = generateSchedule(participants, holidays, 10);
       setSchedule(generatedSchedule);
 
     } catch (err) {
       console.error("Error fetching schedule: ", err);
-      setError('Ocorreu um erro ao buscar a escala. Verifique o console para mais detalhes.');
+      setError('Ocorreu um erro ao buscar a escala.');
     } finally {
       setLoading(false);
     }
@@ -53,49 +51,95 @@ const Schedule = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center bg-white shadow-2xl rounded-2xl p-8 text-center">
-        <FiLoader className="animate-spin text-4xl text-purple-500 mb-4" />
-        <p className="font-semibold text-lg text-gray-700">Carregando a escala...</p>
+      <div className="flex items-center justify-center p-8">
+        <FiLoader className="animate-spin text-4xl text-purple-400" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center bg-red-50 shadow-2xl rounded-2xl p-8 text-center">
-        <FiAlertTriangle className="text-4xl text-red-500 mb-4" />
-        <p className="font-semibold text-lg text-red-700">{error}</p>
+      <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg p-6 flex flex-col items-center text-center">
+        <FiAlertTriangle className="text-4xl mb-4" />
+        <h3 className="font-bold text-lg">Erro ao Carregar</h3>
+        <p>{error}</p>
       </div>
     );
   }
 
+  const [today, ...upcoming] = schedule;
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { ease: 'easeOut', duration: 0.5 } },
+  };
+
   return (
-    <div className="bg-white shadow-2xl rounded-2xl overflow-hidden">
-      <div className="p-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
-        <h2 className="text-3xl font-bold flex items-center justify-center">
-          <FiCalendar className="mr-3" /> Próximos na Escala
-        </h2>
-      </div>
-      <ul className="divide-y divide-gray-200">
-        {schedule.map(({ date, responsible }, index) => (
-          <li 
-            key={index} 
-            className={`flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 transition-colors duration-300 ${index === 0 ? 'bg-purple-50' : 'hover:bg-gray-50'}`}>
-            <div className="flex items-center mb-2 sm:mb-0">
-              <FiCalendar className={`text-xl ${index === 0 ? 'text-purple-700' : 'text-gray-500'}`} />
-              <span className="ml-3 font-medium text-gray-800 capitalize">
-                {format(date, "EEEE, dd 'de' MMMM", { locale: ptBR })}
-              </span>
-            </div>
-            <div className="flex items-center bg-gray-200 rounded-full px-4 py-1 self-end sm:self-center">
-              <FiUser className={`text-lg ${index === 0 ? 'text-purple-700' : 'text-gray-600'}`} />
-              <span className={`ml-2 font-bold ${index === 0 ? 'text-purple-900' : 'text-gray-900'}`}>
-                {responsible?.name || 'Indefinido'}
-              </span>
-            </div>
-          </li>
-        ))}
-      </ul>
+    <div className="space-y-10">
+      {/* Card do Responsável do Dia */}
+      {today && (
+        <motion.div 
+          className="bg-black/20 p-8 rounded-3xl shadow-2xl border border-white/10 text-center relative overflow-hidden"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', damping: 15, stiffness: 100, delay: 0.2 }}
+        >
+          <FiAward className="absolute -top-4 -left-4 text-8xl text-purple-500/20 transform rotate-12"/>
+          <h3 className="text-xl font-light text-purple-300 uppercase tracking-widest">Responsável de Hoje</h3>
+          <p className="text-5xl font-bold my-2 text-white capitalize">
+            {format(today.date, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+          </p>
+          <div className="inline-flex items-center justify-center space-x-4 mt-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full px-8 py-3 text-2xl font-bold shadow-lg">
+            <FiUser />
+            <span>{today.responsible?.name || 'Indefinido'}</span>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Lista dos Próximos */}
+      {upcoming.length > 0 && (
+        <motion.div
+          className="space-y-4"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <h3 className="text-2xl font-bold text-white/80 px-4">Próximos na Escala</h3>
+          <AnimatePresence>
+            {upcoming.map(({ date, responsible }, index) => (
+              <motion.div 
+                key={index} 
+                className="bg-black/10 p-4 rounded-xl flex justify-between items-center border border-white/5 shadow-md"
+                variants={itemVariants}
+                custom={index}
+              >
+                <div className="flex items-center space-x-4">
+                  <FiCalendar className="text-purple-400" />
+                  <span className="font-medium text-lg text-white/90 capitalize">
+                    {format(date, "EEEE, dd/MM", { locale: ptBR })}
+                  </span>
+                </div>
+                <div className="flex items-center space-x-3 bg-white/5 px-4 py-1 rounded-full">
+                  <FiUser className="text-gray-400" />
+                  <span className="font-semibold text-white">
+                    {responsible?.name || 'Indefinido'}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
+      )}
     </div>
   );
 };

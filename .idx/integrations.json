@@ -1,0 +1,6 @@
+{
+  "firebase_hosting": {
+    "deploymentHostingUrl": "https://escala-do-pao.web.app"
+  },
+  "cloud_run_deploy": {}
+}

@@ -6,10 +6,9 @@ import { addDays, isWeekend, isSameDay } from 'date-fns';
  * @param {Array} participants - Lista de participantes (objetos com id e nome).
  * @param {Array<Date>} holidays - Lista de datas de feriados.
  * @param {number} daysToGenerate - Quantidade de dias úteis para gerar na escala.
- * @param {string|null} lastParticipantId - ID do último participante que teve um turno.
  * @returns {Array} - A escala gerada.
  */
-export const generateSchedule = (participants, holidays, daysToGenerate = 10, lastParticipantId = null) => {
+export const generateSchedule = (participants, holidays, daysToGenerate = 10) => {
   if (!participants || participants.length === 0) {
     return [];
   }
@@ -17,15 +16,6 @@ export const generateSchedule = (participants, holidays, daysToGenerate = 10, la
   const schedule = [];
   let currentDate = new Date();
   let participantIndex = 0;
-
-  // Se temos um último participante, encontramos seu índice para continuar a rotação.
-  if (lastParticipantId) {
-    const lastIndex = participants.findIndex(p => p.id === lastParticipantId);
-    if (lastIndex !== -1) {
-      // O próximo índice será o seguinte ao último, com wrap-around.
-      participantIndex = (lastIndex + 1) % participants.length;
-    }
-  }
 
   while (schedule.length < daysToGenerate) {
     // Ignora fins de semana.

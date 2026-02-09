@@ -1,50 +1,68 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
-import { FiHome, FiSettings } from 'react-icons/fi';
+import { FiHome, FiSettings, FiCoffee } from 'react-icons/fi';
+import { AnimatePresence, motion } from 'framer-motion';
 
-function App() {
-  const linkStyle = "flex items-center px-4 py-2 rounded-lg text-gray-200 hover:bg-white/20 transition-colors";
-  const activeLinkStyle = "bg-white/20 font-bold";
+const App = () => {
+  const location = useLocation();
+
+  const PageLayout = ({ children }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.5, ease: 'easeInOut' }}
+    >
+      {children}
+    </motion.div>
+  );
+
+  const linkClasses = "px-4 py-2 rounded-full text-lg font-medium transition-all duration-300 ease-in-out flex items-center space-x-2";
+  const inactiveLink = "text-gray-400 hover:text-white hover:bg-white/10";
+  const activeLink = "text-white bg-white/10 shadow-lg";
 
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-100">
-        {/* Navegação Principal */}
-        <nav className="sticky top-0 z-50 bg-gray-800/80 backdrop-blur-lg shadow-md">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-20">
-              {/* Logo/Título */}
-              <Link to="/" className="text-2xl font-bold text-white tracking-wider">
-                Escala do Pão
-              </Link>
-
-              {/* Links de Navegação */}
-              <div className="flex items-center space-x-4">
-                <NavLink to="/" className={({ isActive }) => `${linkStyle} ${isActive ? activeLinkStyle : ''}`}>
-                  <FiHome className="mr-2" />
-                  <span>Home</span>
-                </NavLink>
-                <NavLink to="/admin" className={({ isActive }) => `${linkStyle} ${isActive ? activeLinkStyle : ''}`}>
-                  <FiSettings className="mr-2" />
-                  <span>Admin</span>
-                </NavLink>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white font-sans">
+      <header className="sticky top-0 z-50 bg-black/30 backdrop-blur-xl border-b border-white/5">
+        <nav className="max-w-7xl mx-auto flex justify-between items-center p-4">
+          <NavLink to="/" className="flex items-center space-x-2 text-2xl font-black tracking-wider">
+            <FiCoffee className="text-purple-400" />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
+              Escala do Pão
+            </span>
+          </NavLink>
+          <div className="flex items-center space-x-4">
+            <NavLink to="/" className={({ isActive }) => `${linkClasses} ${isActive ? activeLink : inactiveLink}`}>
+              <FiHome />
+              <span>Início</span>
+            </NavLink>
+            <NavLink to="/admin" className={({ isActive }) => `${linkClasses} ${isActive ? activeLink : inactiveLink}`}>
+              <FiSettings />
+              <span>Gerenciar</span>
+            </NavLink>
           </div>
         </nav>
+      </header>
 
-        {/* Conteúdo da Página */}
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/admin" element={<Admin />} />
+      <main className="max-w-7xl mx-auto p-8">
+        <AnimatePresence mode='wait'>
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<PageLayout><Home /></PageLayout>} />
+            <Route path="/admin" element={<PageLayout><Admin /></PageLayout>} />
           </Routes>
-        </main>
-      </div>
-    </Router>
+        </AnimatePresence>
+      </main>
+    </div>
   );
 }
 
-export default App;
+// O componente principal precisa estar dentro do Router para usar o useLocation
+const Root = () => (
+  <Router>
+    <App />
+  </Router>
+);
+
+export default Root;
