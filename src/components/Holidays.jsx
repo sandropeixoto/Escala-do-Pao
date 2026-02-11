@@ -20,10 +20,9 @@ const Holidays = () => {
       const data = doc.data();
       return { 
         id: doc.id, 
-        // Garante que a data seja um objeto Date do JS
         date: data.date?.toDate ? data.date.toDate() : null 
       };
-    }).filter(h => h.date); // Filtra qualquer entrada inválida
+    }).filter(h => h.date);
     setHolidays(holidaysList);
     setLoading(false);
   }, []);
@@ -38,7 +37,6 @@ const Holidays = () => {
 
     setIsSubmitting(true);
     try {
-      // O input date retorna "YYYY-MM-DD". O Firestore precisa de um objeto Date.
       const dateObject = parseISO(date); 
       await addDoc(collection(db, 'holidays'), { date: dateObject });
       setDate('');
@@ -74,7 +72,7 @@ const Holidays = () => {
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-300 calendar-picker-indicator-invert"
+          className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all duration-300"
         />
         <button type="submit" disabled={isSubmitting} className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg px-5 py-2 font-semibold hover:scale-105 active:scale-95 transition-transform duration-200 disabled:opacity-50 flex items-center">
           {isSubmitting ? <FiLoader className="animate-spin" /> : <FiPlus />}
@@ -99,7 +97,6 @@ const Holidays = () => {
                 className="flex justify-between items-center bg-white/5 p-3 rounded-lg"
               >
                 <span className="font-medium text-white/90 capitalize">
-                  {/* Formata a data para exibição */}
                   {format(h.date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                 </span>
                 <button onClick={() => handleDelete(h.id)} className="text-red-400 hover:text-red-300 transition-colors">
@@ -115,7 +112,11 @@ const Holidays = () => {
       </div>
       <style>
         {`
-          .calendar-picker-indicator-invert {
+          input[type="date"] {
+            color-scheme: dark;
+          }
+
+          input[type="date"]::-webkit-calendar-picker-indicator {
             filter: invert(1);
           }
         `}

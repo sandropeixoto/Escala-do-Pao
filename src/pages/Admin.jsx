@@ -1,6 +1,7 @@
 import React from 'react';
 import Participants from '../components/Participants';
 import Holidays from '../components/Holidays';
+import Settings from '../components/Settings';
 import { motion } from 'framer-motion';
 
 const Admin = () => {
@@ -35,6 +36,9 @@ const Admin = () => {
         </motion.div>
         <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={2}>
           <Holidays />
+        </motion.div>
+        <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={3} className="md:col-span-2">
+          <Settings />
         </motion.div>
       </div>
     </div>

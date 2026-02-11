@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { db } from '../services/firebase';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
 import { generateSchedule } from '../utils/schedule';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -33,8 +33,12 @@ const Schedule = () => {
           return data.date?.toDate ? data.date.toDate() : null;
         })
         .filter(Boolean);
+        
+      const settingsDoc = await getDoc(doc(db, 'settings', 'schedule'));
+      const settings = settingsDoc.exists() ? settingsDoc.data() : {};
+      const anchorDate = settings.startDate?.toDate ? settings.startDate.toDate() : new Date('2024-01-01');
 
-      const generatedSchedule = generateSchedule(participants, holidays, 10);
+      const generatedSchedule = generateSchedule(participants, holidays, 10, anchorDate);
       setSchedule(generatedSchedule);
 
     } catch (err) {
