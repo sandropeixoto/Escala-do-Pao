@@ -65,7 +65,7 @@ const Holidays = () => {
 
   return (
     <div className="bg-black/20 p-8 rounded-3xl shadow-2xl border border-white/10 h-full">
-      <h3 className="text-2xl font-bold text-white mb-6 flex items-center"><FiCalendar className="mr-3 text-pink-400"/>Feriados</h3>
+      <h3 className="text-2xl font-bold text-white mb-6 flex items-center"><FiCalendar className="mr-3 text-pink-400"/>Feriados/Não Considerar</h3>
 
       <form onSubmit={handleSubmit} className="flex items-center space-x-2 mb-6">
         <input 

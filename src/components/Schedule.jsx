@@ -99,7 +99,7 @@ const Schedule = () => {
           transition={{ type: 'spring', damping: 15, stiffness: 100, delay: 0.2 }}
         >
           <FiAward className="absolute -top-4 -left-4 text-8xl text-purple-500/20 transform rotate-12"/>
-          <h3 className="text-xl font-light text-purple-300 uppercase tracking-widest">Responsável de Hoje</h3>
+          <h3 className="text-xl font-light text-purple-300 uppercase tracking-widest">Responsável da Vez</h3>
           <p className="text-5xl font-bold my-2 text-white capitalize">
             {format(today.date, "EEEE, dd 'de' MMMM", { locale: ptBR })}
           </p>
