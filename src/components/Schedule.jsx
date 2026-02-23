@@ -35,13 +35,14 @@ const Schedule = () => {
           return data.date?.toDate ? data.date.toDate() : null;
         })
         .filter(Boolean);
-        
+
       const settingsDoc = await getDoc(doc(db, 'settings', 'schedule'));
       const settings = settingsDoc.exists() ? settingsDoc.data() : {};
       const anchorDate = settings.startDate?.toDate ? settings.startDate.toDate() : new Date('2024-01-01');
 
-      // Generate schedule for a full cycle of participants
-      const generatedSchedule = await generateSchedule(participants, holidays, participants.length, anchorDate);
+      // Generate schedule for enough days to see absences resolve
+      const daysToShow = Math.max(participants.length * 2, 20);
+      const generatedSchedule = await generateSchedule(participants, holidays, daysToShow, anchorDate);
       setSchedule(generatedSchedule);
 
     } catch (err) {
@@ -94,13 +95,13 @@ const Schedule = () => {
   return (
     <div className="space-y-10">
       {today ? (
-        <motion.div 
+        <motion.div
           className="bg-black/20 p-8 rounded-3xl shadow-2xl border border-white/10 text-center relative overflow-hidden"
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', damping: 15, stiffness: 100, delay: 0.2 }}
         >
-          <FiAward className="absolute -top-4 -left-4 text-8xl text-purple-500/20 transform rotate-12"/>
+          <FiAward className="absolute -top-4 -left-4 text-8xl text-purple-500/20 transform rotate-12" />
           <h3 className="text-xl font-light text-purple-300 uppercase tracking-widest">Responsável da Vez</h3>
           <p className="text-5xl font-bold my-2 text-white capitalize">
             {format(today.date, "EEEE, dd 'de' MMMM", { locale: ptBR })}
@@ -124,8 +125,8 @@ const Schedule = () => {
           <h3 className="text-2xl font-bold text-white/80 px-4">Próximos na Escala</h3>
           <AnimatePresence>
             {upcoming.map(({ date, responsible }, index) => (
-              <motion.div 
-                key={index} 
+              <motion.div
+                key={index}
                 className="bg-black/10 p-4 rounded-xl flex justify-between items-center border border-white/5 shadow-md"
                 variants={itemVariants}
                 custom={index}
