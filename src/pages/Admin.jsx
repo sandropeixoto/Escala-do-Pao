@@ -1,10 +1,27 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
+import { db } from '../services/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 import Participants from '../components/Participants';
 import Holidays from '../components/Holidays';
 import Settings from '../components/Settings';
+import Absences from '../components/Absences';
 import { motion } from 'framer-motion';
 
 const Admin = () => {
+  const [participants, setParticipants] = useState([]);
+
+  const fetchParticipants = async () => {
+    const participantsCollection = collection(db, 'participants');
+    const participantsSnapshot = await getDocs(participantsCollection);
+    const participantsList = participantsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setParticipants(participantsList);
+  };
+
+  useEffect(() => {
+    fetchParticipants();
+  }, []);
+
   const sectionVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: (i) => ({
@@ -27,17 +44,20 @@ const Admin = () => {
         transition={{ duration: 0.6, ease: 'easeInOut' }}
       >
         <h1 className="text-5xl md:text-7xl font-black bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400">Painel de Controle</h1>
-        <p className="max-w-2xl mx-auto mt-4 text-xl text-gray-400">Gerencie os participantes e feriados para a escala do pão de queijo.</p>
+        <p className="max-w-3xl mx-auto mt-4 text-xl text-gray-400">Gerencie participantes, feriados, ausências e configurações da escala do pão de queijo.</p>
       </motion.div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <div className="space-y-12">
         <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={1}>
-          <Participants />
+          <Participants onParticipantsChanged={fetchParticipants} />
         </motion.div>
         <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={2}>
+          <Absences participants={participants} />
+        </motion.div>
+        <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={3}>
           <Holidays />
         </motion.div>
-        <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={3} className="md:col-span-2">
+        <motion.div variants={sectionVariants} initial="hidden" animate="visible" custom={4}>
           <Settings />
         </motion.div>
       </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { db } from '../services/firebase';
 import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
@@ -23,6 +24,7 @@ const Schedule = () => {
       if (participants.length === 0) {
         setError('Nenhum participante cadastrado. Adicione participantes no painel de controle.');
         setSchedule([]);
+        setLoading(false);
         return;
       }
 
@@ -38,7 +40,8 @@ const Schedule = () => {
       const settings = settingsDoc.exists() ? settingsDoc.data() : {};
       const anchorDate = settings.startDate?.toDate ? settings.startDate.toDate() : new Date('2024-01-01');
 
-      const generatedSchedule = generateSchedule(participants, holidays, 10, anchorDate);
+      // Generate schedule for a full cycle of participants
+      const generatedSchedule = await generateSchedule(participants, holidays, participants.length, anchorDate);
       setSchedule(generatedSchedule);
 
     } catch (err) {
@@ -71,7 +74,7 @@ const Schedule = () => {
     );
   }
 
-  const [today, ...upcoming] = schedule;
+  const [today, ...upcoming] = schedule.length > 0 ? schedule : [null];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -90,8 +93,7 @@ const Schedule = () => {
 
   return (
     <div className="space-y-10">
-      {/* Card do Responsável do Dia */}
-      {today && (
+      {today ? (
         <motion.div 
           className="bg-black/20 p-8 rounded-3xl shadow-2xl border border-white/10 text-center relative overflow-hidden"
           initial={{ scale: 0.8, opacity: 0 }}
@@ -108,9 +110,10 @@ const Schedule = () => {
             <span>{today.responsible?.name || 'Indefinido'}</span>
           </div>
         </motion.div>
+      ) : (
+        <div className="text-center text-gray-400">Não há escala para exibir.</div>
       )}
 
-      {/* Lista dos Próximos */}
       {upcoming.length > 0 && (
         <motion.div
           className="space-y-4"
