@@ -1,0 +1,18 @@
+{
+    "name": "escala-do-pao-functions",
+    "description": "Cloud Functions for Escala do Pão API",
+    "type": "module",
+    "scripts": {
+        "serve": "firebase emulators:start --only functions",
+        "deploy": "firebase deploy --only functions"
+    },
+    "engines": {
+        "node": "18"
+    },
+    "main": "index.js",
+    "dependencies": {
+        "date-fns": "^3.6.0",
+        "firebase-admin": "^12.1.0",
+        "firebase-functions": "^5.0.1"
+    }
+}
